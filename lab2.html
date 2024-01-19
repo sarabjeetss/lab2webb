@@ -1,0 +1,285 @@
+<!DOCTYPE html> // SARABJEET SINGH 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Information Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px;
+        }
+        .buttons {
+            flex: 1;
+            text-align: right;
+        }
+        .options {
+            flex: 1;
+            padding-left: 20px;
+        }
+        .result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="buttons">
+            <button onclick="fetchCatNames()">All Names</button><br>
+            <label for="healthInput">Health Issue:</label>
+            <input type="text" id="healthInput" placeholder="Enter Health Issue">
+            <button onclick="fetchCatsByHealthIssue()">Search by Health Issue</button><br>
+            <button onclick="fetchWeight()">Weight</button><br>
+            <button onclick="fetchIntelligence()">Intelligence Friendly</button><br>
+            <button onclick="fetchAverageIntelligence()">Average Intelligence</button><br>
+            <button onclick="fetchChildFriendlyIntelligence()">Average Intelligence for Child Friendly = 4</button>
+        </div>
+        <div class="options">
+            <label>Imperial: <input type="radio" name="unit" value="imperial" checked></label><br>
+            <label>Metric: <input type="radio" name="unit" value="metric"></label><br>
+        </div>
+    </div>
+
+    <div class="result">
+        <div id="MyId"></div>
+        <div id="CatCount"></div>
+    </div>
+
+    <script>
+
+        function takeData(){
+            
+        }
+
+        function fetchCatNames(){
+            MyId = document.getElementById("MyId");
+            MyId.innerHTML = ''; 
+
+            var ProvidedUrl = "https://api.thecatapi.com/v1/breeds";
+
+            fetch(ProvidedUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Something went wrong.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var catCount = Object.keys(data).length;
+
+                    Object.values(data).forEach(Data => {
+                        MyId.appendChild(document.createElement('br'));
+                        TheData = Data.name;
+                        MyId.append(document.createElement('p').innerHTML = TheData);
+                    });
+
+                    document.getElementById("CatCount").innerHTML = "Number of Cats: " + catCount;
+                })
+                .catch(error => {
+                    console.error('Error fetching JSON:', error);
+                });
+        }
+
+        function fetchIntelligence(){
+            var unit = document.querySelector('input[name="unit"]:checked').value;
+
+            MyId = document.getElementById("MyId");
+            MyId.innerHTML = ''; // Clear previous content
+
+            var providedUrl = "https://api.thecatapi.com/v1/breeds";
+
+            fetch(providedUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Something went wrong.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    Object.values(data).forEach(Data => {
+                        MyId.appendChild(document.createElement('br'));
+                        TheData = getIntelligenceText(Data, unit);
+                        MyId.append(document.createElement('p').innerHTML = TheData);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching JSON:', error);
+                });
+        }
+
+        function getIntelligenceText(data, unit) {
+            var intelligenceText = "";
+            if (unit === "metric") {
+                intelligenceText = "Name: " + data.name + ", I: " + data.intelligence + ", F: " + data.child_friendly;
+            } else {
+                intelligenceText = "Name: " + data.name + ", I: " + data.intelligence + ", F: " + data.child_friendly;
+            }
+            return intelligenceText;
+        }
+
+        function fetchAverageIntelligence(){
+            MyId = document.getElementById("MyId");
+            MyId.innerHTML = ''; 
+
+            var providedUrl = "https://api.thecatapi.com/v1/breeds";
+
+            fetch(providedUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Something went wrong.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var totalIntelligence = 0;
+                    var catCount = 0;
+
+                    Object.values(data).forEach(Data => {
+                        totalIntelligence += Data.intelligence;
+                        catCount++;
+                    });
+
+                    var averageIntelligence = totalIntelligence / catCount;
+                    MyId.innerHTML = "Average Intelligence of all cats: " + averageIntelligence.toFixed(2);
+                })
+                .catch(error => {
+                    console.error('Error fetching JSON:', error);
+                });
+        }
+
+        function fetchChildFriendlyIntelligence(){
+            var unit = document.querySelector('input[name="unit"]:checked').value;
+
+            MyId = document.getElementById("MyId");
+            MyId.innerHTML = ''; 
+
+            var providedUrl = "https://api.thecatapi.com/v1/breeds";
+
+            fetch(providedUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Something went wrong.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var totalChildFriendlyIntelligence = 0;
+                    var catCount = 0;
+
+                    Object.values(data).forEach(Data => {
+                        if (Data.child_friendly === 4) {
+                            totalChildFriendlyIntelligence += Data.intelligence;
+                            catCount++;
+                        }
+                    });
+
+                    var averageChildFriendlyIntelligence = totalChildFriendlyIntelligence / catCount;
+                    MyId.innerHTML = "Average Intelligence for Child Friendly = 4: " + averageChildFriendlyIntelligence.toFixed(2);
+                })
+                .catch(error => {
+                    console.error('Error fetching JSON:', error);
+                });
+        }
+
+        function fetchCatsByHealthIssue() {
+            var healthInput = document.getElementById("healthInput").value;
+
+            if (!healthInput || isNaN(healthInput)) {
+                alert("Please enter a valid number for Health Issue.");
+                return;
+            }
+
+            MyId = document.getElementById("MyId");
+            MyId.innerHTML = ''; 
+
+            var providedUrl = "https://api.thecatapi.com/v1/breeds";
+
+            fetch(providedUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Something went wrong.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var catCountWithIssue = 0;
+
+                    Object.values(data).forEach(Data => {
+                        if (Data.health_issues === parseInt(healthInput, 10)) {
+                            MyId.appendChild(document.createElement('br'));
+                            TheData = Data.name;
+                            MyId.append(document.createElement('p').innerHTML = TheData);
+                            catCountWithIssue++;
+                        }
+                    });
+
+                    document.getElementById("CatCount").innerHTML = "Number of Cats with Health Issue " + healthInput + ": " + catCountWithIssue;
+                })
+                .catch(error => {
+                    console.error('Error fetching JSON:', error);
+                });
+        }
+
+        function fetchWeight() {
+            var unit = document.querySelector('input[name="unit"]:checked').value;
+
+            MyId = document.getElementById("MyId");
+            MyId.innerHTML = ''; 
+
+            var providedUrl = "https://api.thecatapi.com/v1/breeds";
+
+            fetch(providedUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Something went wrong.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    Object.values(data).forEach(Data => {
+                        MyId.appendChild(document.createElement('br'));
+                        TheData = getWeightText(Data, unit);
+                        MyId.append(document.createElement('p').innerHTML = TheData);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching JSON:', error);
+                });
+        }
+
+        function getWeightText(data, unit) {
+            var weightText = "";
+            if (unit === "metric") {
+                weightText = "Name: " + data.name + ", Weight Range: " + data.weight.metric;
+            } else {
+                weightText = "Name: " + data.name + ", Weight Range: " + data.weight.imperial;
+            }
+            return weightText;
+        }
+
+        function fetchCatNumber() {
+            var providedUrl = "https://api.thecatapi.com/v1/breeds";
+
+            fetch(providedUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Something went wrong.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var catCount = Object.keys(data).length;
+                    document.getElementById("CatCount").innerHTML = "Number of Cats: " + catCount;
+                })
+                .catch(error => {
+                    console.error('Error fetching JSON:', error);
+                });
+        }
+    </script>
+</body>
+</html>
